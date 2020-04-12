@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: plutus-api
-        image: odiosdado/oddevs:plutus-api-15
+        image: odiosdado/oddevs:plutus-api-18
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000

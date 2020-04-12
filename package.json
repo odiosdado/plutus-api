@@ -16,6 +16,7 @@
   "license": "ISC",
   "homepage": "https://plutus.com",
   "dependencies": {
+    "@babel/runtime": "^7.9.2",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
