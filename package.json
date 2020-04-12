@@ -4,6 +4,7 @@
   "description": "API for plutus",
   "main": "index.js",
   "scripts": {
+    "build": "./node_modules/.bin/babel src --out-dir dist",
     "lint": "",
     "dev": "./node_modules/.bin/nodemon --exec babel-node src/index.js"
   },
