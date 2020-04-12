@@ -26,11 +26,21 @@ const StockDataSchema = new Schema({
 
 StockDataSchema.set('toJSON', {getters: true, virtuals: true});
 
+const decimal2JSON = (v, i, prev) => {
+    if (v !== null && typeof v === 'object') {
+      if (v.constructor.name === 'Decimal128')
+        prev[i] = v.toString();
+      else
+        Object.entries(v).forEach(([key, value]) => decimal2JSON(value, key, prev ? prev[i] : v));
+    }
+  };
+
 StockDataSchema.options.toJSON = {
     transform: (doc, ret, options) => {
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;
+        decimal2JSON(ret);
         return ret;
     }
 };
@@ -46,7 +56,13 @@ StockDataSchema.statics.createStockData = function (stockId, body, callback) {
             logger.log('error', `Error saving new stock data error: ${error}`);
             return callback(error);
         }
-        return callback(null, stockData);
+        if (stockData) {
+            Stock.findOneAndUpdate({ _id: stockId }, { latestStockData: stockData.id }, {upsert: true}, async (err, stock) => {
+                console.log({ err, stock })
+
+                return callback(null, stockData);
+            });
+        }
     });
 };
 

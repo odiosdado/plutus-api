@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "",
-    "dev:build": "./node_modules/.bin/babel src --out-dir dist",
-    "dev:run": "./node_modules/.bin/nodemon --exec babel-node src/index.js"
+    "dev": "./node_modules/.bin/nodemon --exec babel-node src/index.js"
   },
   "repository": {
     "type": "git",

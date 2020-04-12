@@ -5,6 +5,9 @@ const { Schema } = mongoose;
 const StockSchema = new Schema({
     name : String,
     symbol : String,
+    latestStockData: {
+        type: Schema.Types.ObjectId, ref: 'StockData' 
+    }
 }, { timestamps: true});
 
 StockSchema.set('toJSON', {getters: true, virtuals: true});

@@ -1,4 +1,5 @@
 import StockData from '../models/model.stockData';
+import Stock from '../models/model.stock';
 import { handleResponse } from '../utils/helpers';
 
 export const getAllStockData = async (req, res) => {

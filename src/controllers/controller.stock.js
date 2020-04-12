@@ -6,14 +6,14 @@ export const getStocks = async (req, res) => {
 
   const { query } = req;
 
-  Stock.find(query, (err, stocks) => {
+  Stock.find(query).populate('latestStockData').exec((err, stocks) => {
     return handleResponse(err, stocks, req, res);
   });
 }
 
 export const getStock = async (req, res) => {
 
-  Stock.findById(req.params.id, (err, stock) => {
+  Stock.findById(req.params.id).populate('latestStockData').exec((err, stock) => {
     return handleResponse(err, stock, req, res);
   });
 }
