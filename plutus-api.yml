@@ -21,7 +21,7 @@ metadata:
     app: plutus-api
     version: v1
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: plutus-api
@@ -34,11 +34,13 @@ spec:
     spec:
       containers:
       - name: plutus-api
-        image: odiosdado/oddevs:plutus-api-18
+        image: {{image}}
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
         env:
+          - name: PORT
+            value: "3000"
           - name: MONGODB_URI
             value: "mongodb://plutus-db:27017"
           - name: MONGODB_USER
@@ -72,7 +74,7 @@ spec:
   hosts:
   - api.plutus.oddevs.com
   gateways:
-  - istio-system/oddevs-gateway # define gateway name
+  - oddevs-gateway # define gateway name
   http:
   - match:
     - uri:

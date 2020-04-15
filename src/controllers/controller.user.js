@@ -2,6 +2,13 @@ import User from '../models/model.user';
 import Algorithm from '../models/model.algorithm';
 import { handleResponse } from '../utils/helpers';
 
+export const createUser = async (req, res) => {
+
+  User.findById(req.params.id, (err, user) => {
+    return handleResponse(err, user, req, res);
+  });
+}
+
 export const getUser = async (req, res) => {
 
   User.findById(req.params.id, (err, user) => {
