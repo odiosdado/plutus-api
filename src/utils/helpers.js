@@ -37,3 +37,7 @@ export const decimal2JSON = (v, i, prev) => {
 export const nullSafeToString = (value) => {
     return value ? value.toString() : "";
 }
+
+export const isEmpty = (obj) => {
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
+}
