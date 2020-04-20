@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import logger from '../logger';
 import Stock from '../models/model.stock';
+import { decimal2JSON } from '../utils/helpers';
+
 const { Schema } = mongoose;
 
 const StockDataSchema = new Schema({
@@ -25,15 +27,6 @@ const StockDataSchema = new Schema({
 }, { timestamps: true});
 
 StockDataSchema.set('toJSON', {getters: true, virtuals: true});
-
-const decimal2JSON = (v, i, prev) => {
-    if (v !== null && typeof v === 'object') {
-      if (v.constructor.name === 'Decimal128')
-        prev[i] = v.toString();
-      else
-        Object.entries(v).forEach(([key, value]) => decimal2JSON(value, key, prev ? prev[i] : v));
-    }
-  };
 
 StockDataSchema.options.toJSON = {
     transform: (doc, ret, options) => {

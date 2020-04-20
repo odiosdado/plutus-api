@@ -1,9 +1,12 @@
+import moment from 'moment';
 import AlgorithmValue from '../models/model.algorithmValue';
 import { handleResponse } from '../utils/helpers';
 
 export const getAlgorithmValues = async (req, res) => {
 
-  AlgorithmValue.find({ algorithm: req.params.id }, (err, algorithmValue) => {
+  AlgorithmValue.find({
+    algorithm: req.params.id
+  }, (err, algorithmValue) => {
     return handleResponse(err, algorithmValue, req, res);
   });
 }

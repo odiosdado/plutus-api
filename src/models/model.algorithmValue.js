@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import logger from '../logger';
+import { decimal2JSON } from '../utils/helpers';
+
 const { Schema } = mongoose;
 
 let AlgorithmValueSchema = new Schema({
@@ -21,6 +23,7 @@ AlgorithmValueSchema.options.toJSON = {
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;
+        decimal2JSON(ret);
         return ret;
     }
 };
