@@ -33,3 +33,7 @@ export const decimal2JSON = (v, i, prev) => {
             Object.entries(v).forEach(([key, value]) => decimal2JSON(value, key, prev ? prev[i] : v));
     }
 };
+
+export const nullSafeToString = (value) => {
+    return value ? value.toString() : "";
+}

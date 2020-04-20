@@ -2,7 +2,7 @@ import moment from 'moment';
 import stringify from 'csv-stringify';
 import logger from '../logger';
 import AlgorithmValue from '../models/model.algorithmValue';
-import { handleResponse } from '../utils/helpers';
+import { handleResponse, nullSafeToString } from '../utils/helpers';
 
 export const getReport = async (req, res) => {
 
@@ -29,19 +29,21 @@ export const getReport = async (req, res) => {
   ).exec((err, reportValues) => {
 
     if (err) { return handleResponse(err, reportValues, req, res); }
-
+    if (!reportValues || reportValues.length === 0) {
+      return res.status(400).send({ message: `No data found to generate report` });
+    }
     const reportData = []
     for (const alg of reportValues) {
       try {
         const row = {
           symbol: alg.stockData.stock.symbol,
           company: alg.stockData.stock.name,
-          value: alg.value.toString(),
-          netIncome: alg.stockData.netIncome,
-          assets: alg.stockData.assets,
-          liabilities: alg.stockData.liabilities,
-          shares: alg.stockData.shares,
-          price: alg.stockData.price,
+          value: nullSafeToString(alg.value),
+          netIncome: nullSafeToString(alg.stockData.netIncome),
+          assets: nullSafeToString(alg.stockData.assets),
+          liabilities: nullSafeToString(alg.stockData.liabilities),
+          shares: nullSafeToString(alg.stockData.shares),
+          price: nullSafeToString(alg.stockData.price),
         }
         reportData.push(row)
       } catch (err) {
