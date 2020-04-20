@@ -1,7 +1,8 @@
 import moment from 'moment';
+import stringify from 'csv-stringify';
+import logger from '../logger';
 import AlgorithmValue from '../models/model.algorithmValue';
 import { handleResponse } from '../utils/helpers';
-import stringify from 'csv-stringify';
 
 export const getReport = async (req, res) => {
 
@@ -14,6 +15,7 @@ export const getReport = async (req, res) => {
 
   AlgorithmValue.find({
     algorithm: req.params.id,
+    value: { $ne: null },
     createdAt: {
       "$gte": startDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ'),
       "$lt": endDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ')
@@ -27,20 +29,25 @@ export const getReport = async (req, res) => {
   ).exec((err, reportValues) => {
 
     if (err) { return handleResponse(err, reportValues, req, res); }
-    
+
     const reportData = []
     for (const alg of reportValues) {
-      const row = {
-        symbol: alg.stockData.stock.symbol,
-        company: alg.stockData.stock.name,
-        value: alg.value.toString(),
-        netIncome: alg.stockData.netIncome,
-        assets: alg.stockData.assets,
-        liabilities: alg.stockData.liabilities,
-        shares: alg.stockData.shares,
-        price: alg.stockData.price,
+      try {
+        const row = {
+          symbol: alg.stockData.stock.symbol,
+          company: alg.stockData.stock.name,
+          value: alg.value.toString(),
+          netIncome: alg.stockData.netIncome,
+          assets: alg.stockData.assets,
+          liabilities: alg.stockData.liabilities,
+          shares: alg.stockData.shares,
+          price: alg.stockData.price,
+        }
+        reportData.push(row)
+      } catch (err) {
+        logger.error(err.message);
+        logger.error(err);
       }
-      reportData.push(row)
     }
 
     res.setHeader('Content-Type', 'text/csv');
