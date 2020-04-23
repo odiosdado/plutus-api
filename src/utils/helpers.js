@@ -41,3 +41,7 @@ export const nullSafeToString = (value) => {
 export const isEmpty = (obj) => {
     return Object.keys(obj).length === 0 && obj.constructor === Object;
 }
+
+export const isNumber = (value) => {
+    return !isNaN(parseFloat(value)) && !isNaN(value - 0) 
+}
