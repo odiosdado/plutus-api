@@ -28,6 +28,9 @@ export const getReport = async (req, res) => {
       "$lt": endDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ')
     }
   })
+  .sort({
+    value: -1
+  })
   .limit(limit)
   .populate(
     {
