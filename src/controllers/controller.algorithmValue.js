@@ -1,5 +1,7 @@
 import moment from 'moment';
 import AlgorithmValue from '../models/model.algorithmValue';
+import Stock from '../models/model.stock';
+import StockData from '../models/model.stockData';
 import { handleResponse, isEmpty } from '../utils/helpers';
 
 export const getAlgorithmValues = async (req, res) => {
@@ -44,6 +46,34 @@ export const getAlgorithmValues = async (req, res) => {
   ).exec((err, algorithmValue) => {
     return handleResponse(err, algorithmValue, req, res);
   });
+}
+
+export const getAlgorithmValuesBySymbol = async (req, res) => {
+  const { params } = req;
+  const { id, symbol } = params;
+
+  Stock.find({ symbol }, { id }, (err, stocks) => {
+    if(err || stocks.length === 0) {
+      return handleResponse(err, null, req, res);
+    }
+    StockData.find({ stock: stocks }, { id }, (err, stockData) => {
+      if(err || stockData.length === 0) {
+        return handleResponse(err, null, req, res);
+      }
+      AlgorithmValue.find({
+        algorithm: id,
+        stockData: stockData,
+        value: { $ne: null },
+      }).populate(
+        {
+          path: 'stockData',
+          populate: { path : 'stock' }
+        }
+      ).exec((err, algorithmValues) => {
+        return handleResponse(err, algorithmValues, req, res);
+      });
+    })
+  })
 }
 
 export const getAllAlgorithmValues = async (req, res) => {

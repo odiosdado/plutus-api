@@ -12,6 +12,7 @@ router.put('/:id', algorithmController.updateAlgorithm);
 router.delete('/:id', algorithmController.deleteAlgorithm);
 
 router.get('/:id/algorithm-values', algorithmValueController.getAlgorithmValues);
+router.get('/:id/algorithm-values/:symbol', algorithmValueController.getAlgorithmValuesBySymbol);
 router.post('/:id/algorithm-values', algorithmValueController.createAlgorithmValue);
 
 router.get('/:id/report', reportController.getReport);
