@@ -65,7 +65,7 @@ export const getReport = async (req, res) => {
     }
 
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="plutus-report-${Date.now()}.csv"`);
+    res.setHeader('Content-Disposition', `attachment; filename="plutus-report-${startDate.format('YYYY-MM-DD')}.csv"`);
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Pragma', 'no-cache');
     stringify(reportData, { header: true })
