@@ -1,10 +1,27 @@
+import moment from 'moment';
 import StockData from '../models/model.stockData';
 import Stock from '../models/model.stock';
 import { handleResponse } from '../utils/helpers';
 
 export const getAllStockData = async (req, res) => {
-
-  StockData.find({}, (err, stocks) => {
+  const { query } = req;
+  const { date } = query;
+  console.log({ query });
+  let conditions = {};
+  if (date) {
+    const startDate = moment(date);
+    const endDate = moment(date).add(1, 'day');
+    conditions = {
+      createdAt: {
+        "$gte": startDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ'),
+        "$lt": endDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ')
+      }
+    }
+  } 
+  StockData.find(conditions)
+  .populate({
+    path: 'stock'
+  }).exec((err, stocks) => {
     return handleResponse(err, stocks, req, res);
   });
 }

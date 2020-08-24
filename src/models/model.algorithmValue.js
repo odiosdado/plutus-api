@@ -31,8 +31,7 @@ AlgorithmValueSchema.options.toJSON = {
 AlgorithmValueSchema.statics.createAlgorithmValue = function (algorithmId, body, callback) {
     const that = this;
     const algorithmValue = new that({
-        value: body.value,
-        stockData: body.stockData,
+        ... body,
         algorithm: algorithmId,
     });
     algorithmValue.save((error, algorithmValue) => {

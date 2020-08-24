@@ -40,7 +40,7 @@ StockDataSchema.options.toJSON = {
 
 StockDataSchema.statics.createStockData = function (stockId, body, callback) {
     const that = this;
-    const stockData = new that({
+    let stockData = new that({
         ... body,
         stock: stockId
     });
@@ -50,10 +50,15 @@ StockDataSchema.statics.createStockData = function (stockId, body, callback) {
             return callback(error);
         }
         if (stockData) {
-            Stock.findOneAndUpdate({ _id: stockId }, { latestStockData: stockData.id }, {upsert: true}, async (err, stock) => {
-                console.log({ err, stock })
-
-                return callback(null, stockData);
+            stockData.populate('stock', (err) => {
+                if (err) {
+                    logger.log('error', `Error saving new stock data error: ${error}`);
+                    return callback(err);
+                }
+                Stock.findOneAndUpdate({ _id: stockId }, { latestStockData: stockData.id }, { upsert: true }, async (err, stock) => {
+                    console.log({ err, stock })
+                    return callback(null, stockData);
+                })
             });
         }
     });
