@@ -72,7 +72,7 @@ metadata:
   name: plutus-api
 spec:
   hosts:
-  - api.plutus.{{ oddevs_domain }}
+  - api.plutus.{{oddevs_domain}}
   gateways:
   - oddevs-gateway # define gateway name
   http:
