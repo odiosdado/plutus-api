@@ -25,7 +25,7 @@ pipelines:
         name: Deploy
         deployment: development
         script:
-          - sed -i "s|{{image}}|$DOCKER_HUB_USERNAME/$DOCKER_HUB_REPO:plutus-api-$BITBUCKET_BUILD_NUMBER|g" plutus-api.yml
+          - sed -i -e "s|{{image}}|$DOCKER_HUB_USERNAME/$DOCKER_HUB_REPO:plutus-api-$BITBUCKET_BUILD_NUMBER|g" -e "s|{{oddevs_domain}}|$ODDEVS_DOMAIN|g" plutus-api.yml
           - pipe: atlassian/kubectl-run:1.1.2
             variables:
               KUBE_CONFIG: $KUBE_CONFIG
@@ -36,7 +36,7 @@ pipelines:
         deployment: production
         trigger: manual
         script:
-          - sed -i "s|{{image}}|$DOCKER_HUB_USERNAME/$DOCKER_HUB_REPO:plutus-api-$BITBUCKET_BUILD_NUMBER|g" plutus-api.yml
+          - sed -i -e "s|{{image}}|$DOCKER_HUB_USERNAME/$DOCKER_HUB_REPO:plutus-api-$BITBUCKET_BUILD_NUMBER|g" -e "s|{{oddevs_domain}}|$ODDEVS_DOMAIN|g"
           - pipe: atlassian/kubectl-run:1.1.2
             variables:
               KUBE_CONFIG: $KUBE_CONFIG
