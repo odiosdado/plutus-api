@@ -23,7 +23,18 @@ pipelines:
           - docker push $IMAGE_NAME
     - step:
         name: Deploy
+        deployment: development
+        script:
+          - sed -i "s|{{image}}|$DOCKER_HUB_USERNAME/$DOCKER_HUB_REPO:plutus-api-$BITBUCKET_BUILD_NUMBER|g" plutus-api.yml
+          - pipe: atlassian/kubectl-run:1.1.2
+            variables:
+              KUBE_CONFIG: $KUBE_CONFIG
+              KUBECTL_COMMAND: 'apply'
+              RESOURCE_PATH: 'plutus-api.yml'
+    - step:
+        name: Deploy
         deployment: production
+        trigger: manual
         script:
           - sed -i "s|{{image}}|$DOCKER_HUB_USERNAME/$DOCKER_HUB_REPO:plutus-api-$BITBUCKET_BUILD_NUMBER|g" plutus-api.yml
           - pipe: atlassian/kubectl-run:1.1.2
