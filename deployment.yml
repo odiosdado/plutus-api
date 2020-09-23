@@ -1,0 +1,195 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: plutus-api
+  labels:
+    app: plutus-api
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 3000
+  selector:
+    app: plutus-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plutus-api
+  labels:
+    app: plutus-api
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: plutus-api
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: plutus-api
+        version: v1
+    spec:
+      containers:
+      - name: plutus-api
+        image: {{IMAGE_NAME}}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        env:
+          - name: PORT
+            value: "3000"
+          - name: MONGODB_URI
+            value: "mongodb://plutus-db:27017"
+          - name: MONGODB_USER
+            value: "plutus"
+          - name: MONGODB_PASS
+            value: "{{MONGODB_PASS}}"
+          - name: JWT_SECRET
+            value: "2vEp9koTrc32eCKubPOafUuokkTVt3KMFCUd8DXp2IHRVh7X"
+          - name: FACEBOOK_CLIENT_ID
+            value: "1263168497215067"
+          - name: FACEBOOK_CLIENT_SECRET
+            value: "ab5195d6da92e987e8044518073b71ad"
+          - name: FACEBOOK_CALLBACK_URL
+            value: "http://localhost:3000/v1/auth/facebook/callback"
+          - name: FACEBOOK_PROFILE_URL
+            value: "https://graph.facebook.com/v2.5/me?fields=first_name,last_name,email"
+          - name: GOOGLE_CLIENT_ID
+            value: "552080757919-gkhnfd2s13klqf4316mimn3mecker32s.apps.googleusercontent.com"
+          - name: GOOGLE_CLIENT_SECRET
+            value: "485GU9JMfVKcMSM2lxqXwpXy"
+          - name: GOOGLE_CALLBACK_URL
+            value: "http://localhost:3000/v1/auth/google/callback"
+          - name: LOGGER_LEVEL
+            value: "debug"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plutus-db
+  labels:
+    app: plutus-db
+spec:
+  ports:
+    - port: 27017
+      name: tcp
+  selector:
+    app: plutus-db
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: plutus-db-pv
+  labels:
+    app: plutus-db
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+   - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-storage
+  local:
+    path: /data/plutus
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: storage
+          operator: In
+          values:
+          - "true"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: plutus-db-pv-claim
+  labels:
+    app: plutus-db
+spec:
+  storageClassName: local-storage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plutus-db
+  labels:
+    app: plutus-db
+spec:
+  selector:
+    matchLabels:
+      app: plutus-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: plutus-db
+    spec:
+      containers:
+      - image: mongo:4.0.8
+        name: plutus-db
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: plutus-db-pv
+          mountPath: /data/db
+          subPath: mongodb
+        env:
+          - name: MONGO_INITDB_ROOT_USERNAME
+            value: plutus
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            value: {{MONGODB_PASS}}
+      volumes:
+      - name: plutus-db-pv
+        persistentVolumeClaim:
+          claimName: plutus-db-pv-claim
+---
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: plutus-mtls-authn
+spec:
+  targets:
+  - name: plutus-db     # The name of *your* K8s Service
+  peers:
+  - mtls:
+      mode: STRICT
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: plutus-mtls-dr
+spec:
+  host: plutus-db     # The name of *your* K8s Service
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: plutus-api
+spec:
+  hosts:
+  - api.plutus.{{ODDEVS_DOMAIN}}
+  gateways:
+  - oddevs-gateway # define gateway name
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: plutus-api # Backend service name
+        port:
+          number: 80 # Backend service port
