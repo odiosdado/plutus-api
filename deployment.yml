@@ -48,21 +48,21 @@ spec:
           - name: MONGODB_PASS
             value: "{{MONGODB_PASS}}"
           - name: JWT_SECRET
-            value: "2vEp9koTrc32eCKubPOafUuokkTVt3KMFCUd8DXp2IHRVh7X"
+            value: "{{JWT_SECRET}}"
           - name: FACEBOOK_CLIENT_ID
-            value: "1263168497215067"
+            value: "{{FACEBOOK_CLIENT_ID}}"
           - name: FACEBOOK_CLIENT_SECRET
-            value: "ab5195d6da92e987e8044518073b71ad"
+            value: "{{FACEBOOK_CLIENT_SECRET}}"
           - name: FACEBOOK_CALLBACK_URL
-            value: "http://localhost:3000/v1/auth/facebook/callback"
+            value: "{{OAUTH_CALLBACK_HOST}}/v1/auth/facebook/callback"
           - name: FACEBOOK_PROFILE_URL
             value: "https://graph.facebook.com/v2.5/me?fields=first_name,last_name,email"
           - name: GOOGLE_CLIENT_ID
-            value: "552080757919-gkhnfd2s13klqf4316mimn3mecker32s.apps.googleusercontent.com"
+            value: "{{GOOGLE_CLIENT_ID}}"
           - name: GOOGLE_CLIENT_SECRET
-            value: "485GU9JMfVKcMSM2lxqXwpXy"
+            value: "{{GOOGLE_CLIENT_SECRET}}"
           - name: GOOGLE_CALLBACK_URL
-            value: "http://localhost:3000/v1/auth/google/callback"
+            value: "{{OAUTH_CALLBACK_HOST}}/v1/auth/google/callback"
           - name: LOGGER_LEVEL
             value: "debug"
 ---
