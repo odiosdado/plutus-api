@@ -26,6 +26,7 @@ pipelines:
         name: Deploy to development
         deployment: development
         script:
+          - echo $KUBE_CONFIG > test.txt && cat test.txt
           - export APP_NAME=$(echo $BITBUCKET_REPO_FULL_NAME | awk -F"/" '{print $2}')
           - export IMAGE_NAME=$DOCKER_HUB_USERNAME/$DOCKER_HUB_REPO:$APP_NAME-$BITBUCKET_BUILD_NUMBER
           - ./replace-tokens.sh deployment.yml
